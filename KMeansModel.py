@@ -15,6 +15,7 @@ class KmeansModel:
         self.filepath = user_history_data_path
         self.df = pd.read_csv(user_history_data_path)
 
+# Mist 8c
     def preprocessing(self):
         gender_mapping = {'Male': 0, 'Female': 1, 'Other': 2, 0: 0, 1:1, 2:2}  # Ánh xạ giá trị chuỗi thành số
         self.df.gender = self.df.gender.map(gender_mapping)
@@ -115,7 +116,7 @@ class KmeansModel:
 
     def updateListHistoryOrder(self):
         # URL của API
-        api_url = "http://localhost:3003/api/v1/users/history"
+        api_url = "https://cosmetic-ecommerce.onrender.com/api/v1/users/history"
         # Gửi GET request và nhận dữ liệu từ API
         response = requests.get(api_url)
         # Kiểm tra xem request có thành công hay không

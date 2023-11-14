@@ -3,15 +3,12 @@ from flask import Flask, jsonify, request, send_file
 import os
 
 from KMeansModel import KmeansModel
-# from KnnModel import KnnModel
-from RecommenderModel import *
-from crudFeatureCsv import *
+from Recommend import *
 
 app = Flask(__name__)
-app.config["UPLOAD_DIR"] = "Data/unlabeled/"
-# knn = KnnModel('MLmodels/minMaxScaler.pkl', 'MLmodels/pca_21.pkl', 'MLmodels/knn1.joblib')
 km = KmeansModel('csvData/predict.csv')
 km2 = KmeansModel('csvData/history_orders.csv')
+recommend = RecommendModel('csvData/product.csv')
 
 
 @app.route('/hello', methods=['GET'])
@@ -40,13 +37,27 @@ def recommend_product_by_user_id():
         return jsonify(data)
 
 
-@app.route("/trainUserKmeans", methods=["GET"])
+@app.route("/recommend", methods=["GET"])
+def recommend_products():
+    if request.method == 'GET':
+        productId = request.args.get('productId')
+        n = int(request.args.get('minN'))
+        print(productId, n)
+        rm = RecommendModel('csvData/product.csv')
+        rm.preprocessing()
+        results = rm.find_similar_product(productId, min_n=n)
+        data = {"data": results}
+        return jsonify(data)
+
+
+@app.route("/train-data", methods=["GET"])
 def train_user_kmeans():
     if request.method == "GET":
+        recommend.updateListProduct()
         km2.updateListHistoryOrder()
         km2.preprocessing()
         km2.train(5)
-        res = km2.predict()
+        km2.predict()
         data = {"mess": "trained successfully"}
         return jsonify(data)
 
